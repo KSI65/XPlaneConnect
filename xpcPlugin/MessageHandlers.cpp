@@ -23,6 +23,7 @@
 #include "XPLMUtilities.h"
 #include "XPLMScenery.h"
 #include "XPLMGraphics.h"
+#include "XPLMCamera.h"
 
 #include <cmath>
 #include <cstring>
@@ -41,6 +42,9 @@ namespace XPC
 	UDPSocket* MessageHandlers::sock;
 
 	static sockaddr multicast_address = UDPSocket::GetAddr(MULTICAST_GROUP, MULITCAST_PORT);
+
+    // define XPLMCommandRef
+    static XPLMCommandRef	view_type;
 	
 	// define a static terrain probe handler (do not re-create probe for each query)
 	XPLMProbeRef Terrain_probe = nullptr;
@@ -265,7 +269,7 @@ namespace XPC
 			DataManager::Set(DREF_ThrottleActual, throttleArray, 8, aircraftNumber);
 			if (aircraftNumber == 0)
 			{
-				DataManager::Set("sim/flightmodel/engine/ENGN_thro_override", throttleArray, 1);
+				DataManager::Set("sim/flightmodel/engine/ENGN_thro_use", throttleArray, 1);
 			}
 		}
 		if (gear != -1)
@@ -887,7 +891,7 @@ namespace XPC
 		memcpy(&view_type, buffer + 5, 4);
 		
 		// set view by calling the corresponding key stroke
-		XPLMCommandKeyStroke(view_type);
+		XPLMCommandOnce((XPLMCommandRef)view_type);
 		
 		
 		VIEW_TYPE viewRunway = VIEW_TYPE::XPC_VIEW_RUNWAY;
